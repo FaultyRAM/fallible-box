@@ -1,0 +1,46 @@
+branches:
+  only:
+    - staging
+    - trying
+    - master
+environment:
+  matrix:
+    - TARGET: x86_64-pc-windows-gnu
+      CHANNEL: stable
+      CARGO_CHECK: cargo check
+    - TARGET: x86_64-pc-windows-gnu
+      CHANNEL: beta
+      CARGO_CHECK: cargo check
+    - TARGET: x86_64-pc-windows-gnu
+      CHANNEL: nightly
+      CARGO_CHECK: cargo clippy && cargo clippy --tests
+    - TARGET: x86_64-pc-windows-msvc
+      CHANNEL: stable
+      CARGO_CHECK: cargo check
+    - TARGET: x86_64-pc-windows-msvc
+      CHANNEL: beta
+      CARGO_CHECK: cargo check
+    - TARGET: x86_64-pc-windows-msvc
+      CHANNEL: nightly
+      CARGO_CHECK: cargo clippy && cargo clippy --tests
+matrix:
+  allow_failures:
+    - CHANNEL: beta
+    - CHANNEL: nightly
+install:
+  - SET PATH=%USERPROFILE%\.cargo\bin;%PATH%
+  - IF "%TARGET%"=="x86_64-pc-windows-gnu" set PATH=C:\msys64\mingw64\bin;%PATH%
+  - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe"
+  - rustup-init.exe -y --no-modify-path --default-host %TARGET% --default-toolchain %CHANNEL%
+  - rustup component add rustfmt-preview
+  - IF NOT "%CHANNEL%"=="stable" rustup component add clippy-preview && cargo clippy -V
+  - rustup -vV
+  - rustc -vV
+  - cargo -vV
+  - cargo fmt -v --version
+build_script:
+  - "%CARGO_CHECK%"
+  - cargo doc --target %TARGET%
+  - cargo fmt -- --check
+test_script:
+  - cargo test -vv --target=%TARGET%

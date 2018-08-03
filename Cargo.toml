@@ -1,0 +1,14 @@
+[package]
+name = "fallible-box"
+version = "0.1.0"
+authors = ["FaultyRAM <explodingpsu@gmail.com>"]
+description = "Provides a `Box` type that returns an error on OOM instead of panicking."
+repository = "https://github.com/FaultyRAM/fallible-box"
+readme = "README.md"
+keywords = ["box", "heap", "allocation", "fallible"]
+categories = ["memory-management", "no-std"]
+license = "Apache-2.0 OR MIT"
+
+[features]
+default = ["std"]
+std = []
