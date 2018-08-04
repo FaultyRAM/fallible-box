@@ -9,41 +9,44 @@ os:
   - linux
   - osx
 language: rust
+rust:
+  - 1.28.0
+  - stable
+  - beta
+  - nightly
+env:
+  - CHECK=check FEATURES=std
+  - CHECK=clippy FEATURES=
+  - CHECK=clippy FEATURES=coerce-unsized
+  - CHECK=clippy FEATURES=std
+  - CHECK=clippy FEATURES=coerce-unsized std
 matrix:
-  include:
-    - rust: 1.28
+  exclude:
+    - rust: 1.28.0
       env:
-        - CHECK=check
-        - FEATURES=std
+        - CHECK=clippy FEATURES=
+        - CHECK=clippy FEATURES=coerce-unsized
+        - CHECK=clippy FEATURES=std
+        - CHECK=clippy FEATURES=coerce-unsized std
     - rust: stable
       env:
-        - CHECK=check
-        - FEATURES=std
+        - CHECK=clippy FEATURES=
+        - CHECK=clippy FEATURES=coerce-unsized
+        - CHECK=clippy FEATURES=std
+        - CHECK=clippy FEATURES=coerce-unsized std
     - rust: beta
       env:
-        - CHECK=check
-        - FEATURES=std
+        - CHECK=clippy FEATURES=
+        - CHECK=clippy FEATURES=coerce-unsized
+        - CHECK=clippy FEATURES=std
+        - CHECK=clippy FEATURES=coerce-unsized std
     - rust: nightly
-      env:
-        - CHECK=clippy
-        - FEATURES=
-    - rust: nightly
-      env:
-        - CHECK=clippy
-        - FEATURES=coerce-unsized
-    - rust: nightly
-      env:
-        - CHECK=clippy
-        - FEATURES=std
-    - rust: nightly
-      env:
-        - CHECK=clippy
-        - FEATURES=coerce-unsized std
+      env: CHECK=check FEATURES=std
   allow_failures:
     - rust: beta
     - rust: nightly
 install:
-  - if [ "$rust" = "nightly" ]; then rustup component add clippy-preview; fi
+  - if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then rustup component add clippy-preview; fi
   - rustup component add rustfmt-preview
   - cargo fmt -v --version
 script:

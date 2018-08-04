@@ -5,7 +5,7 @@ branches:
     - master
 environment:
   matrix:
-    - CHANNEL: 1.28
+    - CHANNEL: 1.28.0
       CHECK: check
       FEATURES: std
     - CHANNEL: stable
@@ -42,7 +42,7 @@ install:
   - cargo fmt -v --version
 build_script:
   - cargo %CHECK% -vv --tests --no-default-features --features "%FEATURES%"
-  - cargo doc --target %TARGET%
+  - cargo doc
 test_script:
-  - cargo test -vv --target=%TARGET%
+  - cargo test -vv
   - cargo fmt -- --check -v
