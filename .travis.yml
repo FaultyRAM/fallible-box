@@ -58,7 +58,7 @@ install:
   - rustup component add rustfmt-preview
   - cargo fmt -v --version
 script:
-  - cargo $CHECK --tests -vv --no-default-features --features "$FEATURES"
-  - cargo doc -vv
-  - cargo test -vv
+  - cargo $CHECK -vv --tests --no-default-features --features "$FEATURES"
+  - cargo doc -vv --no-default-features --features "$FEATURES"
+  - cargo test -vv --no-default-features --features "$FEATURES"
   - cargo fmt -- --check -v

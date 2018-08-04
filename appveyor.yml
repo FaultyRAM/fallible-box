@@ -42,7 +42,7 @@ install:
   - cargo fmt -v --version
 build_script:
   - cargo %CHECK% -vv --tests --no-default-features --features "%FEATURES%"
-  - cargo doc
+  - cargo doc -vv --no-default-features --features "%FEATURES%"
 test_script:
-  - cargo test -vv
+  - cargo test -vv --no-default-features --features "%FEATURES%"
   - cargo fmt -- --check -v
