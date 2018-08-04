@@ -12,10 +12,7 @@
 #![cfg_attr(not(feature = "std"), feature(alloc))]
 #![cfg_attr(feature = "coerce-unsized", feature(coerce_unsized))]
 #![cfg_attr(feature = "coerce-unsized", feature(unsize))]
-#![cfg_attr(
-    feature = "exact-size-is-empty",
-    feature(exact_size_is_empty)
-)]
+#![cfg_attr(feature = "exact-size-is-empty", feature(exact_size_is_empty))]
 #![deny(warnings)]
 #![forbid(future_incompatible)]
 #![forbid(unused)]
