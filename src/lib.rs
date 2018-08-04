@@ -141,13 +141,19 @@ impl<T: ?Sized> Box<T> {
     /// referenced by the returned pointer is correctly freed. This can be done by passing the
     /// pointer to `Box::from_raw` and dropping the returned box.
     pub fn into_non_null(b: Self) -> NonNull<T> {
-        unsafe { mem::transmute::<Self, NonNull<T>>(b) }
+        let p = b.pointer;
+        mem::forget(b);
+        p
     }
 
     #[inline]
     /// Consumes a box, leaking its contents.
     pub fn leak<'a>(b: Self) -> &'a mut T {
-        unsafe { mem::transmute::<Self, &'a mut T>(b) }
+        unsafe {
+            let p = b.pointer;
+            mem::forget(b);
+            &mut *p.as_ptr()
+        }
     }
 }
 
