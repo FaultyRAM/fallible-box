@@ -11,5 +11,7 @@ license = "Apache-2.0 OR MIT"
 
 [features]
 default = ["std"]
+nightly = ["coerce-unsized", "exact-size-is-empty"]
 coerce-unsized = []
+exact-size-is-empty = []
 std = []

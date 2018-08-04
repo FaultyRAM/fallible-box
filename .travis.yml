@@ -22,13 +22,13 @@ matrix:
       env: CHECK=clippy FEATURES=
     - rust: nightly
       os: linux
-      env: CHECK=clippy FEATURES=coerce-unsized
+      env: CHECK=clippy FEATURES=nightly
     - rust: nightly
       os: linux
       env: CHECK=clippy FEATURES=std
     - rust: nightly
       os: linux
-      env: CHECK=clippy FEATURES=coerce-unsized std
+      env: CHECK=clippy FEATURES=nightly std
     - rust: 1.28.0
       os: osx
       env: CHECK=check FEATURES=std
@@ -43,13 +43,13 @@ matrix:
       env: CHECK=clippy FEATURES=
     - rust: nightly
       os: osx
-      env: CHECK=clippy FEATURES=coerce-unsized
+      env: CHECK=clippy FEATURES=nightly
     - rust: nightly
       os: osx
       env: CHECK=clippy FEATURES=std
     - rust: nightly
       os: osx
-      env: CHECK=clippy FEATURES=coerce-unsized std
+      env: CHECK=clippy FEATURES=nightly std
   allow_failures:
     - rust: beta
     - rust: nightly

@@ -19,13 +19,13 @@ environment:
       FEATURES:
     - CHANNEL: nightly
       CHECK: clippy
-      FEATURES: coerce-unsized
+      FEATURES: nightly
     - CHANNEL: nightly
       CHECK: clippy
       FEATURES: std
     - CHANNEL: nightly
       CHECK: clippy
-      FEATURES: coerce-unsized std
+      FEATURES: nightly std
 matrix:
   allow_failures:
     - CHANNEL: beta
