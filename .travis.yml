@@ -5,43 +5,51 @@ branches:
     - master
 dist: trusty
 sudo: false
-os:
-  - linux
-  - osx
 language: rust
-rust:
-  - 1.28.0
-  - stable
-  - beta
-  - nightly
-env:
-  - CHECK=check FEATURES=std
-  - CHECK=clippy FEATURES=
-  - CHECK=clippy FEATURES=coerce-unsized
-  - CHECK=clippy FEATURES=std
-  - CHECK=clippy FEATURES=coerce-unsized std
 matrix:
-  exclude:
+  include:
     - rust: 1.28.0
-      env:
-        - CHECK=clippy FEATURES=
-        - CHECK=clippy FEATURES=coerce-unsized
-        - CHECK=clippy FEATURES=std
-        - CHECK=clippy FEATURES=coerce-unsized std
-    - rust: stable
-      env:
-        - CHECK=clippy FEATURES=
-        - CHECK=clippy FEATURES=coerce-unsized
-        - CHECK=clippy FEATURES=std
-        - CHECK=clippy FEATURES=coerce-unsized std
-    - rust: beta
-      env:
-        - CHECK=clippy FEATURES=
-        - CHECK=clippy FEATURES=coerce-unsized
-        - CHECK=clippy FEATURES=std
-        - CHECK=clippy FEATURES=coerce-unsized std
-    - rust: nightly
+      os: linux
       env: CHECK=check FEATURES=std
+    - rust: stable
+      os: linux
+      env: CHECK=check FEATURES=std
+    - rust: beta
+      os: linux
+      env: CHECK=check FEATURES=std
+    - rust: nightly
+      os: linux
+      env: CHECK=clippy FEATURES=
+    - rust: nightly
+      os: linux
+      env: CHECK=clippy FEATURES=coerce-unsized
+    - rust: nightly
+      os: linux
+      env: CHECK=clippy FEATURES=std
+    - rust: nightly
+      os: linux
+      env: CHECK=clippy FEATURES=coerce-unsized std
+    - rust: 1.28.0
+      os: osx
+      env: CHECK=check FEATURES=std
+    - rust: stable
+      os: osx
+      env: CHECK=check FEATURES=std
+    - rust: beta
+      os: osx
+      env: CHECK=check FEATURES=std
+    - rust: nightly
+      os: osx
+      env: CHECK=clippy FEATURES=
+    - rust: nightly
+      os: osx
+      env: CHECK=clippy FEATURES=coerce-unsized
+    - rust: nightly
+      os: osx
+      env: CHECK=clippy FEATURES=std
+    - rust: nightly
+      os: osx
+      env: CHECK=clippy FEATURES=coerce-unsized std
   allow_failures:
     - rust: beta
     - rust: nightly
