@@ -9,11 +9,45 @@ os:
   - linux
   - osx
 language: rust
-rust:
-  - stable
-  - beta
-  - nightly
 matrix:
+  include:
+    - rust: 1.28
+      env:
+        - CHECK=check
+        - FEATURES=std
+    - rust: stable
+      env:
+        - CHECK=check
+        - FEATURES=std
+    - rust: beta
+      env:
+        - CHECK=check
+        - FEATURES=std
+    - rust: nightly
+      env:
+        - CHECK=clippy
+        - FEATURES=
+    - rust: nightly
+      env:
+        - CHECK=clippy
+        - FEATURES=coerce-unsized
+    - rust: nightly
+      env:
+        - CHECK=clippy
+        - FEATURES=std
+    - rust: nightly
+      env:
+        - CHECK=clippy
+        - FEATURES=coerce-unsized std
   allow_failures:
-    - beta
-    - nightly
+    - rust: beta
+    - rust: nightly
+install:
+  - if [ "$rust" = "nightly" ]; then rustup component add clippy-preview; fi
+  - rustup component add rustfmt-preview
+  - cargo fmt -v --version
+script:
+  - cargo $CHECK --tests -vv --no-default-features --features "$FEATURES"
+  - cargo doc -vv
+  - cargo test -vv
+  - cargo fmt -- --check -v

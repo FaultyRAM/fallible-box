@@ -5,42 +5,44 @@ branches:
     - master
 environment:
   matrix:
-    - TARGET: x86_64-pc-windows-gnu
-      CHANNEL: stable
-      CARGO_CHECK: cargo check
-    - TARGET: x86_64-pc-windows-gnu
-      CHANNEL: beta
-      CARGO_CHECK: cargo check
-    - TARGET: x86_64-pc-windows-gnu
-      CHANNEL: nightly
-      CARGO_CHECK: cargo clippy && cargo clippy --tests
-    - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: stable
-      CARGO_CHECK: cargo check
-    - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: beta
-      CARGO_CHECK: cargo check
-    - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: nightly
-      CARGO_CHECK: cargo clippy && cargo clippy --tests
+    - CHANNEL: 1.28
+      CHECK: check
+      FEATURES: std
+    - CHANNEL: stable
+      CHECK: check
+      FEATURES: std
+    - CHANNEL: beta
+      CHECK: check
+      FEATURES: std
+    - CHANNEL: nightly
+      CHECK: clippy
+      FEATURES:
+    - CHANNEL: nightly
+      CHECK: clippy
+      FEATURES: coerce-unsized
+    - CHANNEL: nightly
+      CHECK: clippy
+      FEATURES: std
+    - CHANNEL: nightly
+      CHECK: clippy
+      FEATURES: coerce-unsized std
 matrix:
   allow_failures:
     - CHANNEL: beta
     - CHANNEL: nightly
 install:
   - SET PATH=%USERPROFILE%\.cargo\bin;%PATH%
-  - IF "%TARGET%"=="x86_64-pc-windows-gnu" set PATH=C:\msys64\mingw64\bin;%PATH%
   - ps: Start-FileDownload "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe"
-  - rustup-init.exe -y --no-modify-path --default-host %TARGET% --default-toolchain %CHANNEL%
+  - rustup-init.exe -y --no-modify-path --default-host x86_64-pc-windows-msvc --default-toolchain %CHANNEL%
   - rustup component add rustfmt-preview
-  - IF NOT "%CHANNEL%"=="stable" rustup component add clippy-preview && cargo clippy -V
+  - IF "%CHANNEL%"=="nightly" rustup component add clippy-preview && cargo clippy -V
   - rustup -vV
   - rustc -vV
   - cargo -vV
   - cargo fmt -v --version
 build_script:
-  - "%CARGO_CHECK%"
+  - cargo %CHECK% -vv --tests --no-default-features --features "%FEATURES%"
   - cargo doc --target %TARGET%
-  - cargo fmt -- --check
 test_script:
   - cargo test -vv --target=%TARGET%
+  - cargo fmt -- --check -v
