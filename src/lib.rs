@@ -404,3 +404,100 @@ impl<T: ?Sized> Pointer for Box<T> {
 unsafe impl<T: ?Sized + Send> Send for Box<T> {}
 
 unsafe impl<T: ?Sized + Sync> Sync for Box<T> {}
+
+#[cfg(test)]
+mod tests {
+    use Box;
+
+    #[test]
+    fn alloc_zst() {
+        let a = Box::try_new(()).unwrap();
+        assert_eq!(*a, ());
+    }
+
+    #[test]
+    fn alloc_bool() {
+        let _ = Box::try_new(true).unwrap();
+    }
+
+    #[test]
+    fn alloc_u8() {
+        let _ = Box::try_new(1_u8).unwrap();
+    }
+
+    #[test]
+    fn alloc_u64() {
+        let _ = Box::try_new(4_u64).unwrap();
+    }
+
+    #[test]
+    fn alloc_array() {
+        let _ = Box::try_new([1_u8; 256]).unwrap();
+    }
+
+    #[test]
+    fn alloc_struct() {
+        struct Foo(u64, u32);
+        let _ = Box::try_new(Foo(1, 2)).unwrap();
+    }
+
+    #[test]
+    fn equality() {
+        let a = Box::try_new(5).unwrap();
+        let b = Box::try_new(5).unwrap();
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn inequality() {
+        let a = Box::try_new(5).unwrap();
+        let b = Box::try_new(6).unwrap();
+        assert_ne!(a, b);
+    }
+
+    #[test]
+    fn lt() {
+        let a = Box::try_new(5).unwrap();
+        let b = Box::try_new(6).unwrap();
+        assert!(a < b);
+    }
+
+    #[test]
+    fn le() {
+        let a = Box::try_new(5).unwrap();
+        let b = Box::try_new(5).unwrap();
+        let c = Box::try_new(6).unwrap();
+        assert!(a <= b);
+        assert!(a <= c);
+    }
+
+    #[test]
+    fn gt() {
+        let a = Box::try_new(6).unwrap();
+        let b = Box::try_new(5).unwrap();
+        assert!(a > b);
+    }
+
+    #[test]
+    fn ge() {
+        let a = Box::try_new(6).unwrap();
+        let b = Box::try_new(6).unwrap();
+        let c = Box::try_new(5).unwrap();
+        assert!(a >= b);
+        assert!(a >= c);
+    }
+
+    #[test]
+    fn clone() {
+        let a = Box::try_new(5).unwrap();
+        let b = a.try_clone().unwrap();
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn default() {
+        let a = Box::<u16>::try_default().unwrap();
+        let b = u16::default();
+        assert_eq!(*a, b);
+    }
+}
