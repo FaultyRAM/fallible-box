@@ -50,7 +50,7 @@ mod alloc_err;
 
 pub use alloc_err::AllocErr;
 
-use base::alloc::{self, Layout};
+use base::alloc::{alloc, dealloc, Layout};
 use base::any::Any;
 use base::cmp::Ordering;
 use base::fmt::{self, Debug, Display, Formatter, Pointer};
@@ -59,44 +59,11 @@ use base::iter::FusedIterator;
 use base::marker::PhantomData;
 #[cfg(feature = "coerce-unsized")]
 use base::marker::Unsize;
+use base::mem;
 #[cfg(feature = "coerce-unsized")]
 use base::ops::CoerceUnsized;
 use base::ops::{Deref, DerefMut};
 use base::ptr::{self, NonNull};
-use base::{hint, mem};
-
-#[inline]
-fn layout_of<T>() -> Layout {
-    unsafe {
-        Layout::from_size_align(mem::size_of::<T>(), mem::align_of::<T>())
-            .unwrap_or_else(|_| hint::unreachable_unchecked())
-    }
-}
-
-#[inline]
-fn layout_of_val<T: ?Sized>(x: &T) -> Layout {
-    unsafe {
-        Layout::from_size_align(mem::size_of_val(x), mem::align_of_val(x))
-            .unwrap_or_else(|_| hint::unreachable_unchecked())
-    }
-}
-
-#[inline]
-fn alloc_memory<T>() -> Result<NonNull<T>, AllocErr> {
-    unsafe {
-        let p = alloc::alloc(layout_of::<T>()) as *mut T;
-        if p.is_null() {
-            Err(AllocErr)
-        } else {
-            Ok(NonNull::new_unchecked(p))
-        }
-    }
-}
-
-#[inline]
-fn free_memory<T: ?Sized>(p: NonNull<T>) {
-    unsafe { alloc::dealloc(p.as_ptr() as *mut u8, layout_of_val(p.as_ref())) }
-}
 
 /// A smart pointer type that safely manages heap memory.
 pub struct Box<T: ?Sized> {
@@ -107,15 +74,28 @@ pub struct Box<T: ?Sized> {
 impl<T> Box<T> {
     #[inline]
     /// Tries to allocate memory on the heap, and moves `x` into it if successful.
+    ///
+    /// No allocation is performed if `T` is zero-sized.
     pub fn try_new(x: T) -> Result<Self, AllocErr> {
         unsafe {
-            alloc_memory().map(|pointer| {
-                ptr::write(pointer.as_ptr(), x);
-                Self {
-                    pointer,
+            let layout = Layout::new::<T>();
+            if layout.size() == 0 {
+                Ok(Self {
+                    pointer: NonNull::dangling(),
                     marker: PhantomData,
+                })
+            } else {
+                let p = alloc(Layout::new::<T>()) as *mut T;
+                if p.is_null() {
+                    Err(AllocErr)
+                } else {
+                    ptr::write(p, x);
+                    Ok(Self {
+                        pointer: NonNull::new_unchecked(p),
+                        marker: PhantomData,
+                    })
                 }
-            })
+            }
         }
     }
 }
@@ -247,8 +227,11 @@ impl<T: ?Sized + DoubleEndedIterator> DoubleEndedIterator for Box<T> {
 impl<T: ?Sized> Drop for Box<T> {
     fn drop(&mut self) {
         unsafe {
+            let layout = Layout::for_value(self.as_ref());
             ptr::drop_in_place(self.pointer.as_ptr());
-            free_memory(self.pointer);
+            if layout.size() > 0 {
+                dealloc(self.pointer.as_ptr() as *mut u8, layout);
+            }
         }
     }
 }
